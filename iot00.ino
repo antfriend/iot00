@@ -1,14 +1,14 @@
 /*
 Internet Of Thing 001 by Dan Ray
 
-usage: http://iot001/?p=50
+usage: http://iot001/?p=50,50
 
 Board:
  * Arduino Uno
 
  Circuit:
  * Ethernet shield attached to pins 10, 11, 12, 13
- * servo attached to pin 9
+ * servo attached to pins 8,9
 
  modified Web Server example:
  Web Server created 18 Dec 2009
@@ -22,7 +22,7 @@ Board:
 #include <Servo.h> 
 
 byte mac[] = { 0xDA, 0xAD, 0xED, 0x00, 0x00, 0x01 };
-const int RCOUNT = 1;
+const int RCOUNT = 2;
 String Refererers[RCOUNT];
 int RefererersCounterer = 0;
 boolean echo = false;//true=echoes the request headers;false=shows the last n=RCOUNT requests
@@ -128,8 +128,8 @@ void loop() {
             if(p != "0")
             {
               write_webpage(client, p);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!             
-              set_horz_servo(p);
-              set_vert_servo(p);
+              set_horz_servo(Horz_from_p(p));
+              set_vert_servo(Vert_from_p(p));
               pos = p;
               delay(milliseconds_of_delay);
               break;              
@@ -215,12 +215,12 @@ void get_ip(byte mac[])
   }
 }
 
-void set_horz_servo(String one_to_180)
+void set_horz_servo(String one_to_100)
 {
-  int the_length = one_to_180.length() + 1;//+1 includes the null terminating character
-  char Str1to180[the_length];
-  one_to_180.toCharArray(Str1to180, the_length);
-  int the_int = atoi(Str1to180);
+  int the_length = one_to_100.length() + 1;//+1 includes the null terminating character
+  char Str1to100[the_length];
+  one_to_100.toCharArray(Str1to100, the_length);
+  int the_int = atoi(Str1to100);
   the_int = constrain(the_int, 1, 100);
   int reverse_mapped = map(the_int, 1,100,170,1);
   if(horz_servo.attached() == false)
@@ -230,12 +230,12 @@ void set_horz_servo(String one_to_180)
   horz_servo.write(reverse_mapped);
 }
 
-void set_vert_servo(String one_to_180)
+void set_vert_servo(String one_to_100)
 {
-  int the_length = one_to_180.length() + 1;//+1 includes the null terminating character
-  char Str1to180[the_length];
-  one_to_180.toCharArray(Str1to180, the_length);
-  int the_int = atoi(Str1to180);
+  int the_length = one_to_100.length() + 1;//+1 includes the null terminating character
+  char Str1to100[the_length];
+  one_to_100.toCharArray(Str1to100, the_length);
+  int the_int = atoi(Str1to100);
   the_int = constrain(the_int, 1, 100);
   int reverse_mapped = map(the_int, 1,100,170,1);
   if(vert_servo.attached() == false)
@@ -243,6 +243,29 @@ void set_vert_servo(String one_to_180)
     vert_servo.attach(vert_servo_pin);
   }
   vert_servo.write(reverse_mapped);
+}
+
+String Vert_from_p(String theP)
+{
+  int thesep = theP.indexOf(',');
+  String v = "0";
+  if(thesep != -1)
+  {
+    v = theP.substring(thesep + 1, theP.length() - 1);
+  }
+  return v;
+}
+
+String Horz_from_p(String theP)
+{
+  int thesep = theP.indexOf(',');
+  String h = "0";
+  if(thesep != -1)
+  {
+    h = theP.substring(0, thesep - 1);
+    
+  } 
+  return h;
 }
 
 String parse_theCurrentLine(String theCurrentLine)
