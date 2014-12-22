@@ -127,9 +127,12 @@ void loop() {
             
             if(p != "0")
             {
-              write_webpage(client, p);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!             
-              set_horz_servo(Horz_from_p(p));
-              set_vert_servo(Vert_from_p(p));
+              String h = Horz_from_p(p);
+              String v = Vert_from_p(p);     
+              set_horz_servo(h);
+              set_vert_servo(v);
+              
+              write_webpage(client, h, v);//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
               pos = p;
               delay(milliseconds_of_delay);
               break;              
@@ -236,8 +239,8 @@ void set_vert_servo(String one_to_100)
   char Str1to100[the_length];
   one_to_100.toCharArray(Str1to100, the_length);
   int the_int = atoi(Str1to100);
-  the_int = constrain(the_int, 1, 100);
-  int reverse_mapped = map(the_int, 1,100,170,1);
+  the_int = constrain(the_int, 12, 70);
+  int reverse_mapped = map(the_int, 1,100,160,1);
   if(vert_servo.attached() == false)
   {
     vert_servo.attach(vert_servo_pin);
@@ -251,7 +254,7 @@ String Vert_from_p(String theP)
   String v = "0";
   if(thesep != -1)
   {
-    v = theP.substring(thesep + 1, theP.length() - 1);
+    v = theP.substring(thesep + 1, theP.length());
   }
   return v;
 }
@@ -262,7 +265,7 @@ String Horz_from_p(String theP)
   String h = "0";
   if(thesep != -1)
   {
-    h = theP.substring(0, thesep - 1);
+    h = theP.substring(0, thesep);
     
   } 
   return h;
@@ -364,13 +367,14 @@ void send_standard_header(EthernetClient client)
   //client.println("Refresh: 5");  // refresh the page automatically every 5 sec
   client.println();  
 }
-void write_webpage(EthernetClient client, String p)
+void write_webpage(EthernetClient client, String h, String v)
 {
   send_standard_header(client);
   client.println("<!DOCTYPE HTML>");
   client.println("<html>");
   client.println("<br />");
-  client.println("p=" + p + "<br />");
+  client.println("h=" + h + "<br />");
+  client.println("v=" + v + "<br />");
   print_refererers(client);
   client.println("<br />");
   /*
